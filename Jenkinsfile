@@ -28,7 +28,7 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+        stage('Installing Dependencies') {
             steps {
                 sh """ 
                 echo 'App Version: ${appVersion}'
@@ -38,7 +38,7 @@ pipeline {
                 """
             }
         }
-        stage('Zip') {
+        stage('Build') {
             steps {
                 sh """ 
                 zip -q -r backend-${appVersion}.zip * -x Jenkinsfile -x backend-${appVersion}.zip
