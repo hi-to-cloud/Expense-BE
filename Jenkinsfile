@@ -52,6 +52,18 @@ pipeline {
                 """
             }
         }
+        stage('SonarQube') {
+            environment{
+                scannerHome = tool 'sonar' //refer to scanner CLI
+            }
+            steps {
+                script {
+                    withSonarQubeEnv('sonar-6.0') { //referring sonar server
+                        sh "${scannerHome}/bin/sonar-scanner"
+                    }
+                }
+            }
+        }
         stage('Nexus'){
             steps {
                 script{
