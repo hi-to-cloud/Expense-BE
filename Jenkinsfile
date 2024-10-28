@@ -13,6 +13,9 @@ pipeline {
         def repository = 'backend'
         def credentialsId ='nexus-auth'
     }
+    parameters{
+        booleanParam(name: 'deploy', defaultValue: false, description: 'Toggle this value')
+    }
     stages {
         stage('Working Dir') {
             steps {
@@ -67,6 +70,21 @@ pipeline {
                             type: 'zip']
                         ]
                     )
+                }
+            }
+        }
+        stage('Deploy'){
+            when{
+                expression{
+                    params.deploy
+                }
+            }
+            steps{
+                script{
+                    def params = [
+                        string(name: 'appVersion', value: "${appVersion}")
+                    ]
+                    build job: 'BE-Deploy', parameters: params, wait: false
                 }
             }
         }
