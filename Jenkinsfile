@@ -7,8 +7,11 @@ pipeline {
         disableConcurrentBuilds()
         ansiColor('xterm')
     }
+    environment {
+        def appVersion = '' //define variable
+    }
     stages {
-        stage('pwd') {
+        stage('Working Dir') {
             steps {
                 sh """ 
                 pwd 
@@ -16,10 +19,30 @@ pipeline {
                 """
             }
         }
+        stage('App Version'){
+            steps{
+                script{
+                    def packageJson = readJSON file: 'package.json'
+                    appVersion = packageJson.version
+                    echo 'App Version: ${appVersion}'
+                }
+            }
+        }
         stage('Build') {
             steps {
                 sh """ 
+                echo 'App Version: ${appVersion}'
+                echo "Start Installing Dependencies................"
                 npm install
+                echo "Installing Dependencies Done................"
+                """
+            }
+        }
+        stage('Zip') {
+            steps {
+                sh """ 
+                zip -q -r backend-${appVersion}.zip * -x Jenkinsfile -x backend-${appVersion}.zip
+                ls -ltr
                 """
             }
         }
