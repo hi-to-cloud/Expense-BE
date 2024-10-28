@@ -9,6 +9,9 @@ pipeline {
     }
     environment {
         def appVersion = '' //define variable
+        def nexusUrl ='nexus.step-into-iot.cloud:8081'
+        def repository = 'backend'
+        def credentialsId ='nexus-auth'
     }
     stages {
         stage('Working Dir') {
@@ -44,6 +47,27 @@ pipeline {
                 zip -q -r backend-${appVersion}.zip * -x Jenkinsfile -x backend-${appVersion}.zip
                 ls -ltr
                 """
+            }
+        }
+        stage('Nexus'){
+            steps {
+                script{
+                    nexusArtifactUploader(
+                        nexusVersion: 'nexus3',
+                        protocol: 'http',
+                        nexusUrl: "${nexusUrl}",
+                        groupId: 'com.expense',
+                        version: "${appVersion}",
+                        repository: "${repository}",
+                        credentialsId: "${credentialsId}",
+                        artifacts: [
+                            [artifactId: "${repository}",
+                            classifier: '',
+                            file: "${repository}-" + "${appVersion}" + '.zip',
+                            type: 'zip']
+                        ]
+                    )
+                }
             }
         }
     }
